@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/zackkitzmiller/khat/pkg/websocket"
 )
@@ -14,7 +15,14 @@ func main() {
 	go pool.Start()
 	http.HandleFunc("/", statusHandler())
 	http.HandleFunc("/ws", websocketHandler(pool))
-	http.ListenAndServe(":8080", nil)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("RUnning on port %s", port)
+
+	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 }
 
 func websocketHandler(pool *websocket.Pool) http.HandlerFunc {
